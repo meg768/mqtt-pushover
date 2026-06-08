@@ -87,10 +87,15 @@ class App {
 				this.debug(`Connected to host ${argv.host}:${argv.port}...`);
 			});
 
-			this.mqtt.addListener('message', (topic, message) => {
+			this.mqtt.addListener('message', (topic, message, packet) => {
 				try {
 					if (topic != this.argv.topic)
 						return;
+
+					if (packet && packet.retain) {
+						console.log(`Ignoring retained Pushover message on ${topic}.`);
+						return;
+					}
 
 					message = message.toString();
 					message = this.parse(message);
