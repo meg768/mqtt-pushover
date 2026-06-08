@@ -76,6 +76,16 @@ class App {
 	}
 
 
+	clearRetained() {
+		this.mqtt.publish(this.argv.topic, '', {retain:true}, (error) => {
+			if (error)
+				console.error(error);
+			else
+				console.log(`Cleared retained Pushover message on ${this.argv.topic}.`);
+		});
+	}
+
+
 	run() {
 		try {
 
@@ -85,6 +95,7 @@ class App {
 					
 			this.mqtt.on('connect', () => {
 				this.debug(`Connected to host ${argv.host}:${argv.port}...`);
+				this.clearRetained();
 			});
 
 			this.mqtt.addListener('message', (topic, message, packet) => {
@@ -94,6 +105,7 @@ class App {
 
 					if (packet && packet.retain) {
 						console.log(`Ignoring retained Pushover message on ${topic}.`);
+						this.clearRetained();
 						return;
 					}
 
