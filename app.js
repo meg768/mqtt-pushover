@@ -104,7 +104,7 @@ class App {
 						return;
 
 					if (packet && packet.retain) {
-						console.log(`Ignoring retained Pushover message on ${topic}.`);
+						console.log(`Ignoring retained Pushover message on ${topic}. Publish without retain to send notifications.`);
 						this.clearRetained();
 						return;
 					}
