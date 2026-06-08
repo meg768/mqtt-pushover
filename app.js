@@ -46,8 +46,10 @@ class App {
 				push.send(message, (error, result) => {
 					if (error)
 						reject(error);
-					else
+					else {
+						console.log(`Sent Pushover message "${message.message || message.title || ''}".`);
 						resolve();
+					}
 				});
 			}
 			catch (error) {
@@ -59,6 +61,8 @@ class App {
 
 
 	send(payload, config = {}) {
+		console.log(`Sending Pushover payload with keys: ${Object.keys(payload).join(', ')}`);
+
 		return this.pushover({...config, ...payload}).catch((error) => {
 			console.error(error);
 		});
@@ -86,10 +90,15 @@ class App {
 
 			this.mqtt.on(`${this.argv.topic}/:name`, (topic, message, args) => {
 				try {
+					if (topic == `${this.argv.topic}/send`)
+						return;
+
 					message = this.parse(message);
 
-					if (message)
+					if (message) {
+						console.log(`Updated Pushover config "${args.name}".`);
 						this.config[args.name] = message;
+					}
 				}
 				catch (error) {
 					console.error(error);					
@@ -100,8 +109,10 @@ class App {
 				try {
 					message = this.parse(message);
 
-					if (message)
+					if (message) {
+						console.log(`Received named Pushover message "${args.name}" on ${topic}.`);
 						this.send(message, this.config[args.name]);
+					}
 				}
 				catch (error) {
 					console.error(error);					
@@ -109,24 +120,18 @@ class App {
 
 			});
 
-			this.mqtt.on(`${this.argv.topic}`, (topic, message) => {
+			this.mqtt.addListener('message', (topic, message) => {
 				try {
+					if (topic != this.argv.topic && topic != `${this.argv.topic}/send`)
+						return;
+
+					message = message.toString();
 					message = this.parse(message);
 
-					if (message)
+					if (message) {
+						console.log(`Received Pushover message on ${topic}.`);
 						this.send(message);
-				}
-				catch (error) {
-					console.error(error);
-				}
-			});
-
-			this.mqtt.on(`${this.argv.topic}/send`, (topic, message) => {
-				try {
-					message = this.parse(message);
-
-					if (message)
-						this.send(message);
+					}
 				}
 				catch (error) {
 					console.error(error);
