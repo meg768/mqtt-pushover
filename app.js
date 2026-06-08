@@ -38,7 +38,9 @@ class App {
 			try {
 				this.debug(`Sending payload ${JSON.stringify(payload)}`);
 
-				var {user, token, ...message} = payload;
+				var user  = payload.user || process.env.PUSHOVER_USER;
+				var token = payload.token || process.env.PUSHOVER_TOKEN;
+				var {user: _user, token: _token, ...message} = payload;
 				var push = new Pushover({user:user, token:token});
 
 				push.send(message, (error, result) => {
@@ -56,6 +58,21 @@ class App {
 	}
 
 
+	send(payload, config = {}) {
+		return this.pushover({...config, ...payload}).catch((error) => {
+			console.error(error);
+		});
+	}
+
+
+	parse(message) {
+		if (message == '')
+			return null;
+
+		return JSON.parse(message);
+	}
+
+
 	run() {
 		try {
 
@@ -69,11 +86,10 @@ class App {
 
 			this.mqtt.on(`${this.argv.topic}/:name`, (topic, message, args) => {
 				try {
-					if (message != '') {
-						message = JSON.parse(message);
+					message = this.parse(message);
+
+					if (message)
 						this.config[args.name] = message;
-	
-					}
 				}
 				catch (error) {
 					console.error(error);					
@@ -82,16 +98,39 @@ class App {
 
 			this.mqtt.on(`${this.argv.topic}/:name/send`, (topic, message, args) => {
 				try {
-					if (message != '') {
-						message = JSON.parse(message);
-						this.pushover({...this.config[args.name], ...message});
-	
-					}
+					message = this.parse(message);
+
+					if (message)
+						this.send(message, this.config[args.name]);
 				}
 				catch (error) {
 					console.error(error);					
 				}
 
+			});
+
+			this.mqtt.on(`${this.argv.topic}`, (topic, message) => {
+				try {
+					message = this.parse(message);
+
+					if (message)
+						this.send(message);
+				}
+				catch (error) {
+					console.error(error);
+				}
+			});
+
+			this.mqtt.on(`${this.argv.topic}/send`, (topic, message) => {
+				try {
+					message = this.parse(message);
+
+					if (message)
+						this.send(message);
+				}
+				catch (error) {
+					console.error(error);
+				}
 			});
 
 			this.debug(`Subscribing to topic "${this.argv.topic}/#"...`);
