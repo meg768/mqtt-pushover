@@ -2,9 +2,8 @@
 
 Publish a JSON payload to the configured MQTT topic to send a Pushover message.
 The service only handles the exact topic from `MQTT_TOPIC`, for example `pushover`.
-Retained MQTT messages are ignored.
-The service connects with MQTT 5 and `retain as published` so retained publishes
-can be detected even while the service is already subscribed.
+The service connects with MQTT 5 and asks the broker not to deliver retained
+messages when subscribing, so restarts do not replay old notifications.
 
 ## Example
 

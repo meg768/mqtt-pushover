@@ -111,7 +111,7 @@ class App {
 			});
 
 			this.debug(`Subscribing to topic "${this.argv.topic}/#"...`);
-			this.mqtt.subscribe(`${this.argv.topic}/#`, {rap:true});
+			this.mqtt.subscribe(`${this.argv.topic}/#`, {rh:2});
 			
 		}
 		catch(error) {
