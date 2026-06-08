@@ -81,7 +81,7 @@ class App {
 
 			var argv = this.argv;
 
-			this.mqtt = MQTT.connect(argv.host, {username:argv.username, password:argv.password, port:argv.port});
+			this.mqtt = MQTT.connect(argv.host, {username:argv.username, password:argv.password, port:argv.port, protocolVersion:5});
 					
 			this.mqtt.on('connect', () => {
 				this.debug(`Connected to host ${argv.host}:${argv.port}...`);
@@ -111,7 +111,7 @@ class App {
 			});
 
 			this.debug(`Subscribing to topic "${this.argv.topic}/#"...`);
-			this.mqtt.subscribe(`${this.argv.topic}/#`);
+			this.mqtt.subscribe(`${this.argv.topic}/#`, {rap:true});
 			
 		}
 		catch(error) {
