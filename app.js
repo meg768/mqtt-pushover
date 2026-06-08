@@ -29,7 +29,6 @@ class App {
 
 		this.argv   = yargs.argv;
 		this.debug  = this.argv.debug ? console.log : () => {};
-		this.config = {};
 	}
 
 
@@ -60,10 +59,10 @@ class App {
 	}
 
 
-	send(payload, config = {}) {
+	send(payload) {
 		console.log(`Sending Pushover payload with keys: ${Object.keys(payload).join(', ')}`);
 
-		return this.pushover({...config, ...payload}).catch((error) => {
+		return this.pushover(payload).catch((error) => {
 			console.error(error);
 		});
 	}
@@ -88,41 +87,9 @@ class App {
 				this.debug(`Connected to host ${argv.host}:${argv.port}...`);
 			});
 
-			this.mqtt.on(`${this.argv.topic}/:name`, (topic, message, args) => {
-				try {
-					if (topic == `${this.argv.topic}/send`)
-						return;
-
-					message = this.parse(message);
-
-					if (message) {
-						console.log(`Updated Pushover config "${args.name}".`);
-						this.config[args.name] = message;
-					}
-				}
-				catch (error) {
-					console.error(error);					
-				}
-			});
-
-			this.mqtt.on(`${this.argv.topic}/:name/send`, (topic, message, args) => {
-				try {
-					message = this.parse(message);
-
-					if (message) {
-						console.log(`Received named Pushover message "${args.name}" on ${topic}.`);
-						this.send(message, this.config[args.name]);
-					}
-				}
-				catch (error) {
-					console.error(error);					
-				}
-
-			});
-
 			this.mqtt.addListener('message', (topic, message) => {
 				try {
-					if (topic != this.argv.topic && topic != `${this.argv.topic}/send`)
+					if (topic != this.argv.topic)
 						return;
 
 					message = message.toString();

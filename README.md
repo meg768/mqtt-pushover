@@ -1,6 +1,7 @@
 # mqtt-pushover
 
 Publish a JSON payload to the configured MQTT topic to send a Pushover message.
+The service only handles the exact topic from `MQTT_TOPIC`, for example `pushover`.
 
 ```json
 {
