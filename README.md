@@ -41,9 +41,6 @@ With `MQTT_TOPIC=pushover`:
 - `pushover/warning`: warning notification, default priority `1`.
 - `pushover/alarm`: emergency alarm, default priority `2`.
 
-`pushover/notify` is kept as a backwards-compatible alias for
-`pushover/notification`.
-
 All topics accept plain text or the same JSON payload. Plain text is sent as the
 Pushover `message`. If a JSON payload includes `priority`, it overrides the
 topic default. Any message with priority `2` gets default `retry: 60` and
