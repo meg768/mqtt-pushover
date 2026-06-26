@@ -30,7 +30,7 @@ With `MQTT_TOPIC=pushover`:
 
 - `pushover`: backwards-compatible general message topic, default priority `0`.
 - `pushover/message`: general message topic, default priority `0`.
-- `pushover/notify`: normal notification, default priority `0`.
+- `pushover/notify`: low-priority notification, default priority `-1`.
 - `pushover/warning`: warning notification, default priority `1`.
 - `pushover/alarm`: emergency alarm, default priority `2`.
 

@@ -66,7 +66,10 @@ class App {
 			}
 		}
 
-		if ((route == 'message' || route == 'notify') && result.priority == null)
+		if (route == 'notify' && result.priority == null)
+			result.priority = -1;
+
+		if (route == 'message' && result.priority == null)
 			result.priority = 0;
 
 		return result;
