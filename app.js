@@ -41,7 +41,7 @@ class App {
 			return null;
 
 		var route = topic.slice(root.length + 1).split('/')[0];
-		var routes = ['message', 'notify', 'warning', 'alarm'];
+		var routes = ['message', 'notify', 'notification', 'warning', 'alarm'];
 
 		return routes.includes(route) ? route : null;
 	}
@@ -66,7 +66,7 @@ class App {
 			}
 		}
 
-		if (route == 'notify' && result.priority == null)
+		if ((route == 'notify' || route == 'notification') && result.priority == null)
 			result.priority = -1;
 
 		if (route == 'message' && result.priority == null)

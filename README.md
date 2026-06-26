@@ -25,7 +25,7 @@ fields:
 }
 ```
 
-Publish it to `pushover/notify`, or to the root `pushover` topic for backwards
+Publish it to `pushover/notification`, or to the root `pushover` topic for backwards
 compatibility.
 
 If `token` is omitted, `PUSHOVER_TOKEN` from `.env` is used. If `user` is omitted,
@@ -37,9 +37,12 @@ With `MQTT_TOPIC=pushover`:
 
 - `pushover`: backwards-compatible general message topic, default priority `0`.
 - `pushover/message`: general message topic, default priority `0`.
-- `pushover/notify`: low-priority notification, default priority `-1`.
+- `pushover/notification`: low-priority notification, default priority `-1`.
 - `pushover/warning`: warning notification, default priority `1`.
 - `pushover/alarm`: emergency alarm, default priority `2`.
+
+`pushover/notify` is kept as a backwards-compatible alias for
+`pushover/notification`.
 
 All topics accept plain text or the same JSON payload. Plain text is sent as the
 Pushover `message`. If a JSON payload includes `priority`, it overrides the
