@@ -31,6 +31,47 @@ class App {
 		this.debug  = this.argv.debug ? console.log : () => {};
 	}
 
+	routeForTopic(topic) {
+		var root = this.argv.topic;
+
+		if (topic == root)
+			return 'message';
+
+		if (!topic.startsWith(`${root}/`))
+			return null;
+
+		var route = topic.slice(root.length + 1).split('/')[0];
+		var routes = ['message', 'notify', 'warning', 'alarm'];
+
+		return routes.includes(route) ? route : null;
+	}
+
+
+	applyRouteDefaults(payload, route) {
+		var result = {...payload};
+
+		if (route == 'warning' && result.priority == null)
+			result.priority = 1;
+
+		if (route == 'alarm') {
+			if (result.priority == null)
+				result.priority = 2;
+
+			if (Number(result.priority) == 2) {
+				if (result.retry == null)
+					result.retry = 60;
+
+				if (result.expire == null)
+					result.expire = 3600;
+			}
+		}
+
+		if ((route == 'message' || route == 'notify') && result.priority == null)
+			result.priority = 0;
+
+		return result;
+	}
+
 
 	pushover(payload) {
 		return new Promise((resolve, reject) => {
@@ -89,7 +130,9 @@ class App {
 
 			this.mqtt.addListener('message', (topic, message, packet) => {
 				try {
-					if (topic != this.argv.topic)
+					var route = this.routeForTopic(topic);
+
+					if (!route)
 						return;
 
 					if (packet && packet.retain) {
@@ -101,7 +144,8 @@ class App {
 					message = this.parse(message);
 
 					if (message) {
-						console.log(`Received Pushover message on ${topic}.`);
+						message = this.applyRouteDefaults(message, route);
+						console.log(`Received Pushover ${route} on ${topic}.`);
 						this.send(message);
 					}
 				}

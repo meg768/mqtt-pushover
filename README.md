@@ -1,11 +1,14 @@
 # mqtt-pushover
 
 Publish a JSON payload to the configured MQTT topic to send a Pushover message.
-The service only handles the exact topic from `MQTT_TOPIC`, for example `pushover`.
+The service handles the root topic from `MQTT_TOPIC`, for example `pushover`,
+and a few semantic subtopics under it.
 The service connects with MQTT 5 and asks the broker not to deliver retained
 messages when subscribing, so restarts do not replay old notifications.
 
 ## Example
+
+Normal notification:
 
 ```json
 {
@@ -15,8 +18,25 @@ messages when subscribing, so restarts do not replay old notifications.
 }
 ```
 
+Publish it to `pushover/notify`, or to the root `pushover` topic for backwards
+compatibility.
+
 If `token` is omitted, `PUSHOVER_TOKEN` from `.env` is used. If `user` is omitted,
 `PUSHOVER_USER` from `.env` is used.
+
+## Topics
+
+With `MQTT_TOPIC=pushover`:
+
+- `pushover`: backwards-compatible general message topic, default priority `0`.
+- `pushover/message`: general message topic, default priority `0`.
+- `pushover/notify`: normal notification, default priority `0`.
+- `pushover/warning`: warning notification, default priority `1`.
+- `pushover/alarm`: emergency alarm, default priority `2`.
+
+All topics accept the same JSON payload. If the payload includes `priority`, it
+overrides the topic default. For `pushover/alarm`, `retry` defaults to `60` and
+`expire` defaults to `3600` when priority is `2`.
 
 ## Environment
 
