@@ -72,6 +72,14 @@ class App {
 		if (route == 'message' && result.priority == null)
 			result.priority = 0;
 
+		if (Number(result.priority) == 2) {
+			if (result.retry == null)
+				result.retry = 60;
+
+			if (result.expire == null)
+				result.expire = 3600;
+		}
+
 		return result;
 	}
 
@@ -116,7 +124,12 @@ class App {
 		if (message == '')
 			return null;
 
-		return JSON.parse(message);
+		try {
+			return JSON.parse(message);
+		}
+		catch (error) {
+			return {message: message};
+		}
 	}
 
 

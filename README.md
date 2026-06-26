@@ -10,6 +10,13 @@ messages when subscribing, so restarts do not replay old notifications.
 
 Normal notification:
 
+```text
+Build finished
+```
+
+Or JSON when you need title, sound, priority override, URL, or other Pushover
+fields:
+
 ```json
 {
   "title": "Build",
@@ -34,9 +41,10 @@ With `MQTT_TOPIC=pushover`:
 - `pushover/warning`: warning notification, default priority `1`.
 - `pushover/alarm`: emergency alarm, default priority `2`.
 
-All topics accept the same JSON payload. If the payload includes `priority`, it
-overrides the topic default. For `pushover/alarm`, `retry` defaults to `60` and
-`expire` defaults to `3600` when priority is `2`.
+All topics accept plain text or the same JSON payload. Plain text is sent as the
+Pushover `message`. If a JSON payload includes `priority`, it overrides the
+topic default. Any message with priority `2` gets default `retry: 60` and
+`expire: 3600` when those fields are omitted.
 
 ## Environment
 
